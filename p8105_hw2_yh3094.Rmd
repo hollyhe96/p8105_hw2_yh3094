@@ -50,7 +50,9 @@ nrow(filter(transit_data, vending == 'NO'))/nrow(transit_data)
 
 The proportion of station entrances / exits without vending allow entrance is 0.098.
 
-## Reformat data so that route number and route name are distinct variables
+## Reformat data 
+
+The code chunk below reformats the dataset `transit_data` so that route number and route name are distinct variables.
 
 ```{r transit_data_reformat}
 transit_data_reformat = 
@@ -113,10 +115,16 @@ precipitation_data_2017 =
   mutate(year = 2017)
 
 precipitation_data = 
-  full_join(precipiation_data_2016, precipitation_data_2017) %>% 
-  mutate(month = month.name[month])
+  bind_rows(precipiation_data_2016, precipitation_data_2017) %>% 
+  mutate(month = month.name[month]) %>% 
+  select(year, everything())
 precipitation_data
 ```
 
+The Mr. Trash Wheel sheet contains `r nrow(wheel_data)` observations.And it contains variables of month, year, date, weight, volume, plastic bottles, polystyrene, cigarette_butts, glass bottles, grocery bags, chip bags, sports balls and homes powered. 
+
+The precipitation dataset contains `r nrow(precipitation_data)` observations. And it contains variables of year, month and the total precipitaion. 
+
+The total precipitation in 2017 is `r sum(precipitation_data_2017$total)`. The median number of sports balls in a dumpster in 2016 is `r median(filter(wheel_data, year == 2016)$sports_balls)`. 
 
 # Problem 3
