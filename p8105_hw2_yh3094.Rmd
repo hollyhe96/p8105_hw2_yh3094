@@ -20,9 +20,7 @@ transit_data =
   read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
   janitor::clean_names() %>% 
   select(line:entry, vending, ada) %>% 
-  mutate(
-    entry = recode(entry, 'YES' = TRUE, 'NO' = FALSE) 
-  ) 
+  mutate(entry = recode(entry, 'YES' = TRUE, 'NO' = FALSE)) 
 transit_data
 ```
 
@@ -86,12 +84,10 @@ Of the stations that serve the A train, 17 are ADA compliant.
 
 ## Import and clean the Mr. Trash Wheel sheet
 
-```{r }
+```{r wheel_data_import}
 wheel_data = 
-  read_excel(
-    "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
-    sheet = "Mr. Trash Wheel", range = cell_cols("A:N")
-  ) %>% 
+  read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
+             sheet = "Mr. Trash Wheel", range = cell_cols("A:N")) %>% 
   janitor::clean_names() %>% 
   filter(!is.na(dumpster)) %>% 
   mutate(sports_balls = round(sports_balls)) %>% 
@@ -101,16 +97,25 @@ wheel_data
 
 ## Read and clean precipitation data for 2016 and 2017
 
-```{r}
-precip_data_2016 = 
-  read_excel(
-    "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
-    sheet = "2016 Precipitation", range = cell_rows(2:15)
-  ) %>%
+```{r precipitation_data_import}
+precipiation_data_2016 = 
+  read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
+             sheet = "2016 Precipitation", range = cell_rows(2:14)) %>%
   janitor::clean_names() %>%
   filter(!is.na(total)) %>% 
-  mutate(year = 2016)
-  
+  mutate(year = 2016) 
+
+precipitation_data_2017 = 
+  read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
+             sheet = "2017 Precipitation", range = cell_rows(2:14)) %>%
+  janitor::clean_names() %>%
+  filter(!is.na(total)) %>% 
+  mutate(year = 2017)
+
+precipitation_data = 
+  full_join(precipiation_data_2016, precipitation_data_2017) %>% 
+  mutate(month = month.name[month])
+precipitation_data
 ```
 
 
