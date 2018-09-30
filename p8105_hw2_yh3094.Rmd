@@ -1,0 +1,91 @@
+---
+title: "p8105_hw2_yh3094"
+author: "Yun He"
+date: "September 27, 2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Problem 1
+
+## Import and clean NYC transit dataset
+
+```{r transit_data_clean}
+transit_data = 
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>% 
+  select(line:entry, vending, ada) %>% 
+  mutate(
+    entry = recode(entry, 'YES' = TRUE, 'NO' = FALSE) 
+  ) 
+transit_data
+```
+
+The dataset contains variables of line, station name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. I first imported the dataset using `read_csv`, cleaned all variable names using `janitor::clean_names`, and then preserved the variables that I wanted using `select`, and finally, I converted the entry variable from character (YES vs NO) to a logical variable (TRUE vs FALSE) using `recode`. After all cleaning steps above, the final dataset contains `r nrow(transit_data)` rows and `r ncol(transit_data)` columns. In my opinion, these data are untidy because the route variable was spreaded into 11 variables. 
+
+## Calculate the sum of distinct stations 
+
+```{r distinct_station_sum}
+nrow(distinct(transit_data, line, station_name))
+```
+
+There are 465 distinct stations. 
+
+## Calculate the sum of ADA compliant stations
+
+```{r ada_station_sum}
+sum(distinct(transit_data, line, station_name, ada)$ada)
+```
+
+There are 84 ADA compliant stations. 
+
+## Calculate the proportion of stations without vending allow entrance
+
+```{r without_vending_prop}
+nrow(filter(transit_data, vending == 'NO'))/nrow(transit_data)
+```
+
+The proportion of station entrances / exits without vending allow entrance is 0.098.
+
+## Reformat data so that route number and route name are distinct variables
+
+```{r transit_data_reformat}
+transit_data_reformat = 
+  transit_data %>% 
+  gather(key = route_number, value = route_name, route1:route11)
+transit_data_reformat
+```
+
+## Calculate distinct stations that serve the A train
+
+```{r a_train_sum}
+transit_data_A = 
+  transit_data_reformat %>% 
+  filter(route_name == 'A')
+nrow(distinct(transit_data_A, line, station_name))
+```
+
+There are 60 distinct stations that serve the A train.
+
+## Calculate ADA compliant stations that serve the A train
+
+```{r a_train_ada_sum}
+filter(transit_data_A, ada == TRUE) %>% 
+  distinct(line, station_name) %>% 
+  nrow()
+```
+
+Of the stations that serve the A train, 17 are ADA compliant.
+
+# Problem 2
+
+```{r}
+
+```
+
+
+# Problem 3
