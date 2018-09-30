@@ -8,6 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
 ```
 
 # Problem 1
@@ -83,8 +84,33 @@ Of the stations that serve the A train, 17 are ADA compliant.
 
 # Problem 2
 
-```{r}
+## Import and clean the Mr. Trash Wheel sheet
 
+```{r }
+wheel_data = 
+  read_excel(
+    "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
+    sheet = "Mr. Trash Wheel", range = cell_cols("A:N")
+  ) %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(dumpster)) %>% 
+  mutate(sports_balls = round(sports_balls)) %>% 
+  mutate(sports_balls = as.integer(sports_balls))
+wheel_data
+```
+
+## Read and clean precipitation data for 2016 and 2017
+
+```{r}
+precip_data_2016 = 
+  read_excel(
+    "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
+    sheet = "2016 Precipitation", range = cell_rows(2:15)
+  ) %>%
+  janitor::clean_names() %>%
+  filter(!is.na(total)) %>% 
+  mutate(year = 2016)
+  
 ```
 
 
