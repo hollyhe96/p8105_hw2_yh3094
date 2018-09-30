@@ -24,7 +24,7 @@ transit_data =
 transit_data
 ```
 
-The dataset contains variables of line, station name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. I first imported the dataset using `read_csv`, cleaned all variable names using `janitor::clean_names`, and then preserved the variables that I wanted using `select`, and finally, I converted the entry variable from character (YES vs NO) to a logical variable (TRUE vs FALSE) using `recode`. After all cleaning steps above, the final dataset contains `r nrow(transit_data)` rows and `r ncol(transit_data)` columns. In my opinion, these data are untidy because the route variable was spreaded into 11 variables. 
+The dataset contains variables for line, station name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. I first imported the dataset using `read_csv`, cleaned all variable names using `janitor::clean_names`, and then preserved the variables that I wanted using `select`, and finally, I converted the entry variable from character (YES vs NO) to a logical variable (TRUE vs FALSE) using `recode`. After all the cleaning steps above, the final dataset contains `r nrow(transit_data)` rows and `r ncol(transit_data)` columns. In my opinion, these data are untidy because the route variable was spreaded into 11 variables. 
 
 ## Calculate the sum of distinct stations 
 
@@ -121,10 +121,69 @@ precipitation_data =
 precipitation_data
 ```
 
-The Mr. Trash Wheel sheet contains `r nrow(wheel_data)` observations.And it contains variables of month, year, date, weight, volume, plastic bottles, polystyrene, cigarette_butts, glass bottles, grocery bags, chip bags, sports balls and homes powered. 
+The Mr. Trash Wheel sheet contains `r nrow(wheel_data)` observations.And it contains variables for month, year, date, weight, volume, plastic bottles, polystyrene, cigarette_butts, glass bottles, grocery bags, chip bags, sports balls and homes powered. 
 
-The precipitation dataset contains `r nrow(precipitation_data)` observations. And it contains variables of year, month and the total precipitaion. 
+The precipitation dataset contains `r nrow(precipitation_data)` observations. And it contains variables for year, month and the total precipitaion. 
 
 The total precipitation in 2017 is `r sum(precipitation_data_2017$total)`. The median number of sports balls in a dumpster in 2016 is `r median(filter(wheel_data, year == 2016)$sports_balls)`. 
 
 # Problem 3
+
+## Load the data from the `p8105.datasets` package
+
+```{r brfss_data_import}
+devtools::install_github("p8105/p8105.datasets")
+library(p8105.datasets)
+View(brfss_smart2010)
+```
+
+## Clean the BRFSS dataset
+
+The code chunk below cleans the BRFSS dataset and creates a new variable showing the proportion of responses that were “Excellent” or “Very Good”. 
+
+```{r brfss_data_clean}
+brfss_data = 
+  janitor::clean_names(brfss_smart2010) %>% 
+  filter(topic == "Overall Health") %>% 
+  select(-(class:question), -sample_size, -(confidence_limit_low:geo_location)) %>% 
+  spread(key = response, value = data_value) %>% 
+  janitor::clean_names() %>% 
+  mutate(excellent_or_very_good = excellent + very_good)
+```
+
+## Answer questions related to locations
+
+```{r location_calculation}
+nrow(distinct(brfss_data, locationdesc))
+nrow(distinct(brfss_data, locationabbr))
+which.max(table(brfss_data$locationabbr))
+```
+
+There are 404 unique locations included in the dataset. Every state is represented. The state NJ is observed the most.
+
+## Calculate the median “Excellent” response value in 2002
+
+```{r excellent_median}
+median(filter(brfss_data, year == 2002)$excellent, na.rm = TRUE)
+```
+
+The median of the “Excellent” response value in 2002 is 23.6.
+
+## Make a histogram of “Excellent” response values in 2002
+
+```{r excellent_hist}
+ggplot(brfss_data, aes(x = excellent)) +
+  geom_histogram()
+```
+
+## Make a scatterplot 
+
+The code chunk below makes a scatterplot showing the proportion of “Excellent” response values in New York County and Queens County (both in NY State) in each year from 2002 to 2010.
+
+```{r excellent_scatterplot}
+brfss_data %>% 
+  filter(locationdesc == "NY - New York County" | locationdesc == "NY - Queens County") %>%
+  ggplot(aes(x = year, y = excellent, color = locationdesc)) +
+  geom_point()
+```
+
