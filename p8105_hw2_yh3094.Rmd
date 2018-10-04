@@ -102,7 +102,7 @@ Of the stations that serve the A train, 17 are ADA compliant.
 
 ```{r wheel_data_import}
 wheel_data = 
-  read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
+  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx",
              sheet = "Mr. Trash Wheel", range = cell_cols("A:N")) %>% 
   janitor::clean_names() %>% 
   filter(!is.na(dumpster)) %>% 
@@ -117,14 +117,14 @@ The code chunk below first read and clean precipitation data for 2016 and 2017 s
 
 ```{r precipitation_data_import}
 precipiation_data_2016 = 
-  read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
+  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", 
              sheet = "2016 Precipitation", range = cell_rows(2:14)) %>%
   janitor::clean_names() %>%
   filter(!is.na(total)) %>% 
   mutate(year = 2016) 
 
 precipitation_data_2017 = 
-  read_excel("./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", 
+  read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", 
              sheet = "2017 Precipitation", range = cell_rows(2:14)) %>%
   janitor::clean_names() %>%
   filter(!is.na(total)) %>% 
