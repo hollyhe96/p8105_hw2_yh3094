@@ -3,3 +3,5 @@
 These are solutions to the homework 2 of Data Science done by Yun He. 
 
 I made some correction in October 2nd.
+
+I updated the dataset for Mr. trash wheel in October 4th. 
